@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "client"
+		},
+		{
+			"path": "doc"
 		}
 	],
 	"settings": {}

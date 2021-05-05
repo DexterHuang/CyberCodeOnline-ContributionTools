@@ -1,5 +1,14 @@
 # CyberCodeOnline-ContributionTools
 
+Stack:
+- Frontend:
+    - React.js
+    - TypeScript
+    - Hosted on Github.io ?
+- Backend: 
+    - Currently there is no need backend
+
+
 Currently plan:
 - A PWA WebApp that helps with contributing content, such asdungeon map drawer and editor
 - Dungeon map drawer and editor requirements:

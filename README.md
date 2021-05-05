@@ -89,5 +89,7 @@ We as the CCO Community are going to make an automation tool to help reduce the 
 	Maybe words and protips can be merged into one page, 
 	and lore and tutorials in another since they both share the same rough
 	format and interface. 
+
+	Please do not try to reinvent the wheel, if there is a library that can do what we need, just import and use it.
 	
 	

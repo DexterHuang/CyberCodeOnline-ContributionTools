@@ -7,6 +7,12 @@ We as the CCO Community are going to make an automation tool to help reduce the 
 
 ## Stage 1: 
 	- Simple PWA app that outputs final JSON on screen, allows user to copy and paste the edited json into the main repo manually
+	- Dungeon design editor
+		- Loads existing dungeon from contribution repo (GET request directly to GitHub raw file)
+		- Editing existing existing design
+		- Delete existing design
+		- Addeding new design
+		- Output json file ready to be copied and used fro pull request at contribution repo
 	
 ## Stage 2: 
 	- Github integration, user will be able to login with their github account, after editing, a PR will be automatically created with the user's account in the main repo

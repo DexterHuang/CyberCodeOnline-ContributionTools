@@ -5,6 +5,8 @@ all changes merged to master will be automatically deployed to production -> htt
 # Cyber Code Online Submission Automation Tool
 We as the CCO Community are going to make an automation tool to help reduce the workload for our hardworking volunteer mods and making it easier for people to contribute content to CCO. By having a UI for submissions it makes it simple for people to submit new contributions and automatically format it. Automatic github integrations also make everyone's life easier.
 
+- Should we add a music / art upload page? Can all go straight into a github folder for review.
+
 ## Stage 1: 
 	- Simple PWA app that outputs final JSON on screen, allows user to copy and paste the edited json into the main repo manually
 	- Dungeon design editor

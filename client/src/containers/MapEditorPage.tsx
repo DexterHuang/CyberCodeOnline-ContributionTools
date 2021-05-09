@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import Typography from '@material-ui/core/Typography'
 import { Grid, AStarFinder } from "pathfinding"
 import { Canvas } from '../components/Canvas'
@@ -33,33 +33,34 @@ export const MapEditorPage = (): JSX.Element => {
         ctx.stroke()
       }
   }
-  const tiles: Array<Array<Tile>> = []
+  const [tiles] = useState<Array<Array<Tile>>>([])
   // for each column, add an array
-  for(let x=0;x<15;x += 1){
-    tiles.push([])
-    for(let y=0;y<15;y += 1){
-      // if an entrance, push empty
-      if((x === 0 && y === 7) || (x === 7 && y === 0) || (x === 14 && y === 7) || (x === 7 && y === 14)){
-        tiles[x].push({
-          type: TileType.Empty,
-          editable: false
-        })
-      }
-      // if a wall, push empty
-      else if ( x === 0 || y === 14 || x === 14 || y === 0) {
-        tiles[x].push({
-          type: TileType.Wall,
-          editable: false
-        })
-      } else {
-        tiles[x].push({
-          type: TileType.Empty,
-          editable: true
-        })
+  if(tiles.length === 0) {
+    for(let x=0;x<15;x += 1){
+      tiles.push([])
+      for(let y=0;y<15;y += 1){
+        // if an entrance, push empty
+        if((x === 0 && y === 7) || (x === 7 && y === 0) || (x === 14 && y === 7) || (x === 7 && y === 14)){
+          tiles[x].push({
+            type: TileType.Empty,
+            editable: false
+          })
+        }
+        // if a wall, push empty
+        else if ( x === 0 || y === 14 || x === 14 || y === 0) {
+          tiles[x].push({
+            type: TileType.Wall,
+            editable: false
+          })
+        } else {
+          tiles[x].push({
+            type: TileType.Empty,
+            editable: true
+          })
+        }
       }
     }
   }
-
   const getGrid = (): Array<Array<number>> => tiles.map(x => x.map(y => y.type !== TileType.Empty ? 1 : 0))
   const pathfinder = new AStarFinder()
   const validateEntrancePaths = (): boolean => {
@@ -77,16 +78,16 @@ export const MapEditorPage = (): JSX.Element => {
     return leftResult.length > 0 && bottomResult.length > 0 && rightResult.length > 0
   }
 
-  let tileWidth = 0
-  let tileHeight = 0
+  const [tileWidth, setTileWidth] = useState<number>(0)
+  const [tileHeight, setTileHeight] = useState<number>(0)
   const edgeOffset = 4
-  let mouseX = 0
-  let mouseY = 0
-  let drawMouseTile = false
+  const [mouseX, setMouseX] = useState<number>(0)
+  const [mouseY, setMouseY] = useState<number>(0)
+  const [drawMouseTile, setDrawMouseTile] = useState<boolean>(false)
   const draw = (ctx: CanvasRenderingContext2D): void => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    tileWidth = ctx.canvas.width / 15
-    tileHeight = ctx.canvas.height / 15
+    setTileWidth(ctx.canvas.width / 15)
+    setTileHeight(ctx.canvas.height / 15)
     roundRect(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, 5, false, true)
     ctx.fillStyle = '#000000'
     ctx.font = `${tileWidth-4}px Courier New`
@@ -101,6 +102,7 @@ export const MapEditorPage = (): JSX.Element => {
       roundRect(ctx, mouseX * tileWidth, mouseY * tileHeight, tileWidth, tileHeight, 3, false, true)
     }
   }
+  const [pathValidated, setPathValidated] = useState(true)
 
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
@@ -121,7 +123,7 @@ export const MapEditorPage = (): JSX.Element => {
     } else if(tiles[x][y].type === TileType.Wall){
       tiles[x][y].type = TileType.Empty
     }
-    validateEntrancePaths()
+    setPathValidated(validateEntrancePaths)
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
@@ -133,16 +135,27 @@ export const MapEditorPage = (): JSX.Element => {
     if(clickX < edgeOffset || clickY < edgeOffset){
       return
     }
-    mouseX = Math.floor((clickX - edgeOffset) / tileWidth)
-    mouseY = Math.floor((clickY - edgeOffset) / (tileHeight))
-    drawMouseTile = true
+    setMouseX(Math.floor((clickX - edgeOffset) / tileWidth))
+    setMouseY(Math.floor((clickY - edgeOffset) / (tileHeight)))
+    setDrawMouseTile(true)
+  }
+
+  const DisplayValidationErrors = ():JSX.Element => {
+    if(pathValidated) {
+      return (<></>)
+    }
+    return (<div>
+      {!pathValidated && <Typography variant="subtitle2" style={{color: "red"}}>An entrance is blocked</Typography>}
+      </div>
+    )
   }
 
   return (
     <div>
     <Typography paragraph>
       idk draw on the canvas and make the json go brr
-    </Typography>
+    </Typography> 
+    <DisplayValidationErrors/>
     <Canvas draw={draw} canvasOpts={{height: 300, width: 300, onClick:handleClick, onMouseMove: handleMouseMove}}/>
     </div>
   )

@@ -62,7 +62,9 @@ export const MapEditorPage = (): JSX.Element => {
         }
       }
     }
-    roundRect(ctx, mouseX * tileWidth, mouseY * tileHeight, tileWidth, tileHeight, 3, false, true)
+    if(drawMouseTile) {
+      roundRect(ctx, mouseX * tileWidth, mouseY * tileHeight, tileWidth, tileHeight, 3, false, true)
+    }
   }
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
@@ -82,7 +84,6 @@ export const MapEditorPage = (): JSX.Element => {
     mouseX = Math.floor((clickX - edgeOffset) / tileWidth)
     mouseY = Math.floor((clickY - edgeOffset) / (tileHeight))
     drawMouseTile = true
-
   }
   return (
     <div>

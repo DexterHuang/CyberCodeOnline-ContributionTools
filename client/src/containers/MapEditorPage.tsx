@@ -74,7 +74,6 @@ export const MapEditorPage = (): JSX.Element => {
     const leftResult = pathfinder.findPath(0, 7, 7, 0, leftGrid)
     const bottomResult = pathfinder.findPath(0, 7, 14, 7, bottomGrid)
     const rightResult = pathfinder.findPath(0, 7, 7, 14, rightGrid)
-    console.log(`valid pathing: `, leftResult.length > 0 && bottomResult.length > 0 && rightResult.length > 0)
     return leftResult.length > 0 && bottomResult.length > 0 && rightResult.length > 0
   }
 

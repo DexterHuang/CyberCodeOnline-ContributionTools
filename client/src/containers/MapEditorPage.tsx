@@ -1,5 +1,6 @@
 import React from 'react'
 import Typography from '@material-ui/core/Typography'
+import { Grid, AStarFinder } from "pathfinding"
 import { Canvas } from '../components/Canvas'
 
 interface Tile {
@@ -58,6 +59,24 @@ export const MapEditorPage = (): JSX.Element => {
       }
     }
   }
+
+  const getGrid = (): Array<Array<number>> => tiles.map(x => x.map(y => y.type !== TileType.Empty ? 1 : 0))
+  const pathfinder = new AStarFinder()
+  const validateEntrancePaths = (): boolean => {
+    // you can assume that if 1 entrance can reach every other entrance
+    // any particular entrance can reach every other entrance
+    const matrix = getGrid()
+    // pathfinding alters each grid, so we need to have unique instances for each run
+    const leftGrid = new Grid(matrix)
+    const bottomGrid = new Grid(matrix)
+    const rightGrid = new Grid(matrix)
+    const leftResult = pathfinder.findPath(0, 7, 7, 0, leftGrid)
+    const bottomResult = pathfinder.findPath(0, 7, 14, 7, bottomGrid)
+    const rightResult = pathfinder.findPath(0, 7, 7, 14, rightGrid)
+    console.log(`valid pathing: `, leftResult.length > 0 && bottomResult.length > 0 && rightResult.length > 0)
+    return leftResult.length > 0 && bottomResult.length > 0 && rightResult.length > 0
+  }
+
   let tileWidth = 0
   let tileHeight = 0
   const edgeOffset = 4
@@ -82,6 +101,7 @@ export const MapEditorPage = (): JSX.Element => {
       roundRect(ctx, mouseX * tileWidth, mouseY * tileHeight, tileWidth, tileHeight, 3, false, true)
     }
   }
+
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
     const clickY = event.pageY - event.currentTarget.offsetTop
@@ -101,6 +121,7 @@ export const MapEditorPage = (): JSX.Element => {
     } else if(tiles[x][y].type === TileType.Wall){
       tiles[x][y].type = TileType.Empty
     }
+    validateEntrancePaths()
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
@@ -116,6 +137,7 @@ export const MapEditorPage = (): JSX.Element => {
     mouseY = Math.floor((clickY - edgeOffset) / (tileHeight))
     drawMouseTile = true
   }
+
   return (
     <div>
     <Typography paragraph>

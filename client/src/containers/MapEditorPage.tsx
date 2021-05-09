@@ -45,6 +45,9 @@ export const MapEditorPage = (): JSX.Element => {
   let tileWidth = 0
   let tileHeight = 0
   const edgeOffset = 4
+  let mouseX = 0
+  let mouseY = 0
+  let drawMouseTile = false
   const draw = (ctx: CanvasRenderingContext2D): void => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     tileWidth = ctx.canvas.width / 15
@@ -59,6 +62,7 @@ export const MapEditorPage = (): JSX.Element => {
         }
       }
     }
+    roundRect(ctx, mouseX * tileWidth, mouseY * tileHeight, tileWidth, tileHeight, 3, false, true)
   }
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
@@ -71,12 +75,21 @@ export const MapEditorPage = (): JSX.Element => {
       tiles[x][y] = EmptyTile
     }
   }
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
+    const clickX = event.pageX - event.currentTarget.offsetLeft
+    const clickY = event.pageY - event.currentTarget.offsetTop
+    mouseX = Math.floor((clickX - edgeOffset) / tileWidth)
+    mouseY = Math.floor((clickY - edgeOffset) / (tileHeight))
+    drawMouseTile = true
+
+  }
   return (
     <div>
     <Typography paragraph>
       idk draw on the canvas and make the json go brr
     </Typography>
-    <Canvas draw={draw} canvasOpts={{height: 300, width: 300, onClick:handleClick}}/>
+    <Canvas draw={draw} canvasOpts={{height: 300, width: 300, onClick:handleClick, onMouseMove: handleMouseMove}}/>
     </div>
   )
 }

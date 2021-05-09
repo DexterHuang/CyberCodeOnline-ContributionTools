@@ -2,8 +2,15 @@ import React from 'react'
 import Typography from '@material-ui/core/Typography'
 import { Canvas } from '../components/Canvas'
 
-const EmptyTile = 0
-const WallTile = 1
+interface Tile {
+  type: TileType
+  editable: boolean
+}
+
+enum TileType {
+  Empty = 0,
+  Wall = 1
+}
 
 export const MapEditorPage = (): JSX.Element => {
   const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: boolean, stroke: boolean): void => {
@@ -25,20 +32,29 @@ export const MapEditorPage = (): JSX.Element => {
         ctx.stroke()
       }
   }
-  const tiles: Array<Array<number>> = []
+  const tiles: Array<Array<Tile>> = []
   // for each column, add an array
   for(let x=0;x<15;x += 1){
     tiles.push([])
     for(let y=0;y<15;y += 1){
       // if an entrance, push empty
       if((x === 0 && y === 7) || (x === 7 && y === 0) || (x === 14 && y === 7) || (x === 7 && y === 14)){
-        tiles[x].push(EmptyTile)
+        tiles[x].push({
+          type: TileType.Empty,
+          editable: false
+        })
       }
       // if a wall, push empty
       else if ( x === 0 || y === 14 || x === 14 || y === 0) {
-        tiles[x].push(WallTile)
+        tiles[x].push({
+          type: TileType.Wall,
+          editable: false
+        })
       } else {
-        tiles[x].push(EmptyTile)
+        tiles[x].push({
+          type: TileType.Empty,
+          editable: true
+        })
       }
     }
   }
@@ -57,7 +73,7 @@ export const MapEditorPage = (): JSX.Element => {
     ctx.font = `${tileWidth-4}px Courier New`
     for(let x = 0; x < 15; x += 1) {
       for(let y = 0; y < 15; y += 1) {
-        if(tiles[x][y] === WallTile) {
+        if(tiles[x][y].type === TileType.Wall) {
           ctx.strokeText("#", edgeOffset+(x*tileWidth), (tileHeight) * (y+1) - edgeOffset)
         }
       }
@@ -69,18 +85,33 @@ export const MapEditorPage = (): JSX.Element => {
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
     const clickY = event.pageY - event.currentTarget.offsetTop
+    // edgeOffset only applies to the left and top of the canvas
+    // so if you click close enough to either border, its possible to be out of bounds
+    // in the tile array as a result. Because of this we exit early
+    if(clickX <= edgeOffset || clickY <= edgeOffset){
+      return
+    }
     const x = Math.floor((clickX - edgeOffset) / tileWidth)
     const y = Math.floor((clickY - edgeOffset) / (tileHeight))
-    if(tiles[x][y] === EmptyTile) {
-      tiles[x][y] = WallTile
-    } else if(tiles[x][y]===WallTile){
-      tiles[x][y] = EmptyTile
+    if(!tiles[x][y].editable) {
+      return
+    }
+    if(tiles[x][y].type === TileType.Empty) {
+      tiles[x][y].type = TileType.Wall
+    } else if(tiles[x][y].type === TileType.Wall){
+      tiles[x][y].type = TileType.Empty
     }
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>): void => {
     const clickX = event.pageX - event.currentTarget.offsetLeft
     const clickY = event.pageY - event.currentTarget.offsetTop
+    // edgeOffset only applies to the left and top of the canvas
+    // so if you click close enough to either border, its possible to be out of bounds
+    // in the tile array as a result. Because of this we exit early
+    if(clickX < edgeOffset || clickY < edgeOffset){
+      return
+    }
     mouseX = Math.floor((clickX - edgeOffset) / tileWidth)
     mouseY = Math.floor((clickY - edgeOffset) / (tileHeight))
     drawMouseTile = true

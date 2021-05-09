@@ -1,4 +1,6 @@
 import React, {useState} from 'react'
+import { CopyBlock, github } from "react-code-blocks"
+import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import { Grid, AStarFinder } from "pathfinding"
 import { Canvas } from '../components/Canvas'
@@ -149,6 +151,35 @@ export const MapEditorPage = (): JSX.Element => {
     )
   }
 
+  const getTileCharacter = (tile: Tile): string => {
+    if(tile.type === TileType.Wall){
+      return "#"
+    }
+    return " "
+  }
+  const [jsonOutput, setJsonOutput] = useState<string>("JSON will be output here")
+  const generateJson = ():string => {
+    let json = `\t\t{\n\t\t\t"tiles": [`
+    for(let y=0; y<15;y += 1) {
+      if(y < 15) {
+        json += `\n\t\t\t\t`
+      }
+      for(let x=0; x<15; x+=1) {
+        if(x > 0) {
+          json += " "
+        }
+        json += `"${getTileCharacter(tiles[x][y])}",`
+      }
+    }
+    // remove that comma at the end
+    json = json.slice(0, -1)
+    json += `\n\t\t\t]\n\t\t}`
+    return json
+  }
+  const handleGenerateJson = (): void => {
+    setJsonOutput(generateJson())
+  }
+
   return (
     <div>
     <Typography paragraph>
@@ -156,6 +187,12 @@ export const MapEditorPage = (): JSX.Element => {
     </Typography> 
     <DisplayValidationErrors/>
     <Canvas draw={draw} canvasOpts={{height: 300, width: 300, onClick:handleClick, onMouseMove: handleMouseMove}}/>
+    <Button variant="contained" color="primary" onClick={handleGenerateJson}>
+      Generate JSON
+    </Button>
+    <div style={{ maxWidth: 800 }}>
+    <CopyBlock text={jsonOutput} theme={github} language="javascript" style={{maxWidth:400}}/>
+    </div>
     </div>
   )
 }
